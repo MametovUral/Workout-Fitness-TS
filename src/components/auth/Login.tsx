@@ -8,7 +8,6 @@ import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
-  
   FormField,
   FormItem,
   FormLabel,
@@ -16,7 +15,19 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { FiAlertTriangle } from "react-icons/fi";
+import FillLoading from "../shared/FillLoading";
+
 function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
   const { setAuth } = useAuthState();
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -27,12 +38,25 @@ function Login() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    const { email, password } = values;
+
+    setIsLoading(true);
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      navigate("/");
+    } catch (error) {
+      const result = error as Error;
+      setError(result.message);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <div>
+      {isLoading && <FillLoading />}
+
       <h2 className="text-xl font-bold">Login</h2>
       <p className="text-muted-foreground">
         Don't have an account?{" "}
@@ -44,6 +68,13 @@ function Login() {
         </span>
       </p>
       <Separator className="my-3" />
+      {error && (
+        <Alert className="mb-2" variant="destructive">
+          <FiAlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <FormField
@@ -53,7 +84,11 @@ function Login() {
               <FormItem>
                 <FormLabel>Email adress</FormLabel>
                 <FormControl>
-                  <Input placeholder="example@gmail.com" {...field} />
+                  <Input
+                    placeholder="example@gmail.com"
+                    disabled={isLoading}
+                    {...field}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -67,13 +102,18 @@ function Login() {
               <FormItem>
                 <FormLabel>Pasword</FormLabel>
                 <FormControl>
-                  <Input placeholder="********" type="password" {...field} />
+                  <Input
+                    placeholder="********"
+                    type="password"
+                    disabled={isLoading}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button className="h-12 w-full" type="submit">
+          <Button className="h-12 w-full" type="submit" disabled={isLoading}>
             Submit
           </Button>
         </form>
