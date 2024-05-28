@@ -3,9 +3,26 @@ import { featuredItems, programs } from "@/constants";
 import men from "@/assets/men.png";
 import { Card } from "@/components/ui/card";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useUserState } from "@/stores/user.store";
+import { CgGym } from "react-icons/cg";
+import { LuLogOut } from "react-icons/lu";
+import { auth } from "@/firebase";
 
 function Home() {
+  const { user, setUser } = useUserState();
+  const navigate = useNavigate();
+
+  async function onLogout() {
+    try {
+      await auth.signOut();
+      setUser(null);
+      navigate("/auth");
+    } catch (error) {
+      console.log("error logout");
+    }
+  }
+
   return (
     <section className="container max-w-6xl h-screen mx-auto mt-40 mb-10">
       <div className="w-full flex items-center mb-20">
@@ -15,11 +32,32 @@ function Home() {
             A huge selection of health and fitness content, healthy recipes and
             transformation stories to help you get fit and stay !
           </p>
-          <Link to={"/auth"}>
-            <Button className="w-fit mt-6 font-bold h-12" size={"lg"}>
-              Join club now
-            </Button>
-          </Link>
+
+          {user ? (
+            <div className="flex gap-4">
+              <Link to={"/dashboard"}>
+                <Button className="w-fit mt-6 font-bold h-12" size={"lg"}>
+                  <span>Go to GYM</span>
+                  <CgGym className="ml-4 size-5" />
+                </Button>
+              </Link>
+              <Button
+                className="w-fit mt-6 font-bold h-12"
+                size={"lg"}
+                variant={"destructive"}
+                onClick={onLogout}
+              >
+                <span>Logout</span>
+                <LuLogOut className="ml-4 size-5" />
+              </Button>
+            </div>
+          ) : (
+            <Link to={"/auth"}>
+              <Button className="w-fit mt-6 font-bold h-12" size={"lg"}>
+                Join club now
+              </Button>
+            </Link>
+          )}
 
           <div className="mt-24">
             <p className="text-muted-foreground uppercase">as featured in</p>
