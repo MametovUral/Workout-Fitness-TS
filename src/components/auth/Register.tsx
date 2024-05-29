@@ -43,7 +43,7 @@ function Register() {
     setIsLoading(true);
 
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
       navigate("/");
     } catch (error) {
       const result = error as Error;

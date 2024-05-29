@@ -43,7 +43,7 @@ function Login() {
 
     setIsLoading(true);
     try {
-      const res = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       navigate("/");
     } catch (error) {
       const result = error as Error;
