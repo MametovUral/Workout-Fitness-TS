@@ -24,7 +24,7 @@ interface Props {
   handler: (values: z.infer<typeof taskSchema>) => Promise<void | null>;
 }
 
-function TaskForm({ title = "", handler }: Props) {
+function TaskForm({ title = "", handler, isEdit, onClose }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUserState();
 
@@ -68,8 +68,19 @@ function TaskForm({ title = "", handler }: Props) {
               </FormItem>
             )}
           />
-          <div className="flex justify-end">
-            <Button className="h-12" type="submit" disabled={isLoading}>
+          <div className="flex gap-2 justify-end">
+            {isEdit && (
+              <Button
+                className="h-10"
+                variant={"destructive"}
+                type="button"
+                disabled={isLoading}
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+            )}
+            <Button className="h-10" type="submit" disabled={isLoading}>
               Submit
             </Button>
           </div>
