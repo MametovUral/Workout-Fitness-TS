@@ -21,12 +21,14 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { FiAlertTriangle } from "react-icons/fi";
 import FillLoading from "../shared/FillLoading";
+import { useUserState } from "@/stores/user.store";
 
 function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const { setAuth } = useAuthState();
+  const { setUser } = useUserState();
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof registerSchema>>({
@@ -43,7 +45,8 @@ function Register() {
     setIsLoading(true);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      setUser(res.user);
       navigate("/");
     } catch (error) {
       const result = error as Error;

@@ -1,4 +1,5 @@
 import Navbar from "@/components/shared/Navbar";
+import { Toaster } from "@/components/ui/sonner";
 import { Outlet } from "react-router-dom";
 
 function RootLayout() {
@@ -6,6 +7,7 @@ function RootLayout() {
     <>
       <Navbar />
       <Outlet />
+      <Toaster position="bottom-right" />
     </>
   );
 }

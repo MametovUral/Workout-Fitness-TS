@@ -22,13 +22,16 @@ import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { FiAlertTriangle } from "react-icons/fi";
 import FillLoading from "../shared/FillLoading";
+import { useUserState } from "@/stores/user.store";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
   const { setAuth } = useAuthState();
+  const { setUser } = useUserState();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -43,7 +46,8 @@ function Login() {
 
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      setUser(res.user)
       navigate("/");
     } catch (error) {
       const result = error as Error;
